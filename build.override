@@ -1,0 +1,22 @@
+# configs for veux
+ARCH=arm64
+LLVM=1
+LLVM_IAS=1
+M_CONFIG=veux_defconfig
+M_GOALS=(
+    Image
+    dtbs
+)
+POST_DEFCONFIG_CMDS="
+    configure_lto thin;
+    configure -e KSU;
+    configure_droidspaces_gki;
+"
+configure_inject_ramdisk() {
+    configure \
+        -e RD_LZMA \
+        -e INITRAMFS_FORCE \
+        -e INITRAMFS_FORCE_RECOVERY \
+    --set-str INITRAMFS_SOURCE "source/usr/ramdisk.cpio" \
+        -e INITRAMFS_COMPRESSION_LZMA
+}
