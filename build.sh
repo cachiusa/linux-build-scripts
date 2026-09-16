@@ -9,23 +9,27 @@ if [[ ${NO_CLEANING} != "1" ]]; then
     
     eee "> Generating config"
     __make "${DEFCONFIG}"
-    
-    if [ -n "${POST_DEFCONFIG_CMDS}" ]; then
-        eee "> Running pre-make command(s):"
-        set +e -x
-        eval "${POST_DEFCONFIG_CMDS}"
-        set -e +x
+
+    if [[ -n ${LTO} ]]; then
+        configure_lto "${LTO}"
     fi
+    
+    for cmd in "${POST_DEFCONFIG_CMDS[@]}"; do
+        eee "> Running pre-make command:"
+        set +e -x
+        eval "$cmd"
+        set -e +x
+    done
 fi
 
 eee "> Starting build"
 __make "${M_TARGETS[@]}"
 
-if [ -n "${POST_BUILD_CMDS}" ]; then
-    eee "> Running post-build command(s):"
+for cmd in "${POST_BUILD_CMDS[@]}"; do
+    eee "> Running post-build command:"
     set +e -x
-    eval "${POST_BUILD_CMDS}"
+    eval "$cmd"
     set -e +x
-fi
+done
 
 eee "> Build finished"

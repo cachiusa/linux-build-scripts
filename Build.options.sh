@@ -13,6 +13,9 @@ ARCH=
 # Empty value will use clang/gcc
 CC=
 
+# Path to build toolchain
+TC_HOME=
+
 # GNU toolchain prefix
 # For example, if set to:
 #       "x86_64-redhat-linux-"
@@ -48,10 +51,10 @@ DEFCONFIG=
 M_TARGETS=()
 
 # Commands to run after .config file is generated
-POST_DEFCONFIG_CMDS=
+POST_DEFCONFIG_CMDS=()
 
 # Commands to run after kernel build
-POST_DEFCONFIG_CMDS=
+POST_DEFCONFIG_CMDS=()
 
 # Set the metadata shown in /proc/version
 KBUILD_BUILD_TIMESTAMP=$(commit_time)

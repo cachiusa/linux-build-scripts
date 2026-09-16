@@ -68,6 +68,7 @@ envsetup() {
     export ARCH
     export CROSS_COMPILE
     export KBUILD_BUILD_TIMESTAMP KBUILD_BUILD_HOST KBUILD_BUILD_USER KBUILD_BUILD_VERSION
+    export PATH=$TC_HOME:$PATH
     set_colors
     print_path
 }
