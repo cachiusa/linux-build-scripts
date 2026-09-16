@@ -3,7 +3,7 @@
 JOBS=$(nproc)
 
 # Build output directory
-OUT_DIR=out
+OUT_DIR=${OUT_DIR:-out}
 
 # Target architecture
 # Empty value will use build host's arch
@@ -64,11 +64,17 @@ KBUILD_BUILD_VERSION=1
 
 # Inherit user configs
 # Do not change unless you know what you're doing
-for dd in "." ".."; do
-    ff=${scriptPWD}/${dd}/Build.options
+for dd in "$scriptPWD" "$PWD"; do
+    ff=${dd}/Build.options
     if [[ -f "$ff" ]]; then
         set_colors
         eee "> Using config file:\n  $ff"
         . "$ff"
     fi
 done
+
+if [[ -f ${BUILD_CONFIG} ]]; then
+    set_colors
+    eee "> Using config file:\n  $BUILD_CONFIG"
+    . "$BUILD_CONFIG"
+fi

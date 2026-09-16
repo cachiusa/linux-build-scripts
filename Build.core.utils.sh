@@ -43,7 +43,10 @@ commit_time() {
     date -d @"$SOURCE_DATE_EPOCH"
 }
 envsetup() {
-    M_ARGS=("-j${JOBS}" "O=${OUT_DIR}")
+    M_ARGS=("-j${JOBS}")
+    if [[ -n ${OUT_DIR} ]]; then
+        add_arg "O=${OUT_DIR}"
+    fi
     if [[ -n ${LLVM} ]]; then
         add_arg "LLVM=1"
         if [[ -n ${LLVM_IAS} ]]; then
