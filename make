@@ -5,4 +5,4 @@
 scriptPWD=$(dirname "$(realpath "${BASH_SOURCE[0]}")")
 . "${scriptPWD}/Build.core.sh"
 
-__make "$@"
+__make
