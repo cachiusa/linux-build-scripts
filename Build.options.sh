@@ -35,7 +35,7 @@ CLANG_TRIPLE=
 # Most newer kernels will adopt this
 LLVM=
 
-# 1 = use GCC toolchain's assembler
+# 1 = use GNU assembler "as"
 # 0 = use Clang's integrated assembler
 LLVM_IAS=
 
@@ -48,7 +48,7 @@ USE_CCACHE=
 DEFCONFIG=
 
 # Build targets
-# Run 'make help' for available targets. Items marked with '*' will be built if this array is empty
+# Run './build/make help' for available targets. Items marked with * will be built if this array is empty
 M_TARGETS=()
 
 # Commands to run after .config file is generated
