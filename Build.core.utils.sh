@@ -42,6 +42,14 @@ commit_time() {
     SOURCE_DATE_EPOCH=$(git log -1 --pretty=%ct)
     date -d @"$SOURCE_DATE_EPOCH"
 }
+export_and_print() {
+    for v in "$@"; do
+        # shellcheck disable=SC2163
+        export "$v"
+        vv=$(eval "echo \$$v")
+        echo "$v=$vv"
+    done
+}
 envsetup() {
     M_ARGS=("-j${JOBS}")
     if [[ -n ${OUT_DIR} ]]; then
@@ -52,9 +60,6 @@ envsetup() {
         if [[ -n ${LLVM_IAS} ]]; then
             add_arg "LLVM_IAS=1"
         fi
-    fi
-    if [[ -n ${CLANG_TRIPLE} ]]; then
-        add_arg "CLANG_TRIPLE=${CLANG_TRIPLE}"
     fi
     if [[ -n ${CC} ]]; then
         add_arg "CC=${CC}"
@@ -68,10 +73,11 @@ envsetup() {
     if [[ ${USE_CCACHE} = "1" ]]; then
         add_arg "CC=ccache ${CC}"
     fi
-    export ARCH
-    export CROSS_COMPILE
-    export KBUILD_BUILD_TIMESTAMP KBUILD_BUILD_HOST KBUILD_BUILD_USER KBUILD_BUILD_VERSION
-    export PATH=$TC_HOME:$PATH
+    if [[ -d ${TC_HOME} ]]; then
+        export PATH=$TC_HOME:$PATH
+    fi
+    export_and_print ARCH CROSS_COMPILE CLANG_TRIPLE \
+        KBUILD_BUILD_TIMESTAMP KBUILD_BUILD_HOST KBUILD_BUILD_USER KBUILD_BUILD_VERSION
     set_colors
     print_path
 }

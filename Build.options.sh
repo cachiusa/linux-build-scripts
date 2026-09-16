@@ -27,6 +27,7 @@ CROSS_COMPILE=
 
 # Target triple
 # Only used by AOSP version of Clang
+# https://lkml.org/lkml/2021/9/9/136
 CLANG_TRIPLE=
 
 # 1 = Use LLVM toolchain
@@ -64,17 +65,14 @@ KBUILD_BUILD_VERSION=1
 
 # Inherit user configs
 # Do not change unless you know what you're doing
-for dd in "$scriptPWD" "$PWD"; do
-    ff=${dd}/Build.options
-    if [[ -f "$ff" ]]; then
-        set_colors
-        eee "> Using config file:\n  $ff"
-        . "$ff"
-    fi
-done
-
 if [[ -f ${BUILD_CONFIG} ]]; then
-    set_colors
     eee "> Using config file:\n  $BUILD_CONFIG"
     . "$BUILD_CONFIG"
+else
+    for dd in "$scriptPWD" "$PWD"; do
+        ff=${dd}/Build.options
+        [[ ! -f "$ff" ]] && continue
+        eee "> Using config file:\n  $ff"
+        . "$ff"
+    done
 fi

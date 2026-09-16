@@ -1,3 +1,5 @@
+A legacy of https://android.googlesource.com/kernel/build/+/670b2ff547c0739352a200422e4e8a7149145947
+
 # Manual
 
 ```
@@ -37,7 +39,6 @@ To enable verbose output:
 To use 24 concurrent build jobs:
 
     build/build.sh -j24
-
 
 ## make
 
