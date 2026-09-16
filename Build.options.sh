@@ -62,7 +62,7 @@ KBUILD_BUILD_VERSION=1
 # Inherit user configs
 # Do not change unless you know what you're doing
 for dd in "." ".."; do
-    ff=${scriptPWD}/${dd}/build.override
+    ff=${scriptPWD}/${dd}/Build.override
     if [[ -f "$ff" ]]; then
         set_colors
         eee "> Using config file:\n  $ff"

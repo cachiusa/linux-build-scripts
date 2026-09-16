@@ -44,9 +44,6 @@ commit_time() {
 }
 envsetup() {
     M_ARGS=("-j${JOBS}" "O=${OUT_DIR}")
-    if [[ -n ${ARCH} ]]; then
-        add_arg "ARCH=${ARCH}"
-    fi
     if [[ -n ${LLVM} ]]; then
         add_arg "LLVM=1"
         if [[ -n ${LLVM_IAS} ]]; then
@@ -68,6 +65,7 @@ envsetup() {
     if [[ ${USE_CCACHE} = "1" ]]; then
         add_arg "CC=ccache ${CC}"
     fi
+    export ARCH
     export CROSS_COMPILE
     export KBUILD_BUILD_TIMESTAMP KBUILD_BUILD_HOST KBUILD_BUILD_USER KBUILD_BUILD_VERSION
     set_colors
