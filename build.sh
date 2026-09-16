@@ -1,8 +1,5 @@
 #!/usr/bin/env bash
 
-# Usage:
-#   build/build.sh <make options>*
-
 set -e
 MAKE_OVERRIDES=("$@")
 scriptPWD=$(dirname "$(realpath "${BASH_SOURCE[0]}")")
@@ -10,7 +7,6 @@ scriptPWD=$(dirname "$(realpath "${BASH_SOURCE[0]}")")
 . "${scriptPWD}/etc_utils.sh"
 . "${scriptPWD}/etc_kconfigs.sh"
 . "${scriptPWD}/options.sh"
-
 envsetup
 
 if [[ ${NO_CLEANING} != "1" ]]; then
