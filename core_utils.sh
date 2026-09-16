@@ -27,12 +27,12 @@ print_path() {
 __make() {
     # The make wrapper
     set -x
-    make "${M_ARGS[@]}" "${MAKE_OVERRIDES[@]}" "$@"
+    make "${M_ARGS[@]}" "${M_OVERRIDE_ARGS[@]}" "$@"
     set +x
 }
 configure() {
     set -x
-    ./scripts/config --file "${M_OUT}/.config" "$@"
+    ./scripts/config --file "${OUT_DIR}/.config" "$@"
     set +x
     __make olddefconfig
 }
@@ -43,7 +43,7 @@ commit_time() {
     date -d @"$SOURCE_DATE_EPOCH"
 }
 envsetup() {
-    M_ARGS=("-j${JOBS}" "O=${M_OUT}")
+    M_ARGS=("-j${JOBS}" "O=${OUT_DIR}")
     if [[ -n ${ARCH} ]]; then
         add_arg "ARCH=${ARCH}"
     fi

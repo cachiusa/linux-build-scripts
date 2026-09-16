@@ -2,7 +2,6 @@
 
 # Standalone make wrapper
 
-set -e
 scriptPWD=$(dirname "$(realpath "${BASH_SOURCE[0]}")")
 . "${scriptPWD}/core_utils.sh"
 . "${scriptPWD}/etc_utils.sh"

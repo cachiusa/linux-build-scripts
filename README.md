@@ -1,6 +1,18 @@
 # Manual
-
-All commands must be run from the top directory of Linux source
+```
+kernel tree <--- run build scripts from HERE
+├── android      example:
+├── arch         $ ./build/build.sh
+├── block
+├── build <--- clone this repo HERE
+├── certs
+├── crypto
+├── Documentation
+├── drivers
+├── fs
+├── include
+...
+```
 
 ## options.sh
 
@@ -16,7 +28,7 @@ Full kernel build script
 
     build/build.sh <make options>*
 
-### Examples:
+### Example
 To enable verbose output:
 
     build/build.sh V=1
@@ -30,5 +42,5 @@ To use 24 concurrent build jobs:
 
 Wrapper script to run `make` commands
 
-### Example:
+### Example
     build/make menuconfig|config|nconfig|... 

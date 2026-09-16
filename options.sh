@@ -3,11 +3,28 @@
 JOBS=$(nproc)
 
 # Build output directory
-M_OUT=out
+OUT_DIR=out
+
+# Target architecture
+# Empty value will use build host's arch
+ARCH=
 
 # C Compiler
-# Leave empty for gcc/clang
+# Empty value will use clang/gcc
 CC=
+
+# GNU toolchain prefix
+# For example, if set to:
+#       "x86_64-redhat-linux-"
+# then the kernel build system would use: 
+#       x86_64-redhat-linux-gcc
+#       x86_64-redhat-linux-ld
+#       ...
+CROSS_COMPILE=
+
+# Target triple
+# Only used by AOSP version of Clang
+CLANG_TRIPLE=
 
 # 1 = Use LLVM toolchain
 # 0 = Do not
@@ -20,29 +37,30 @@ LLVM_IAS=
 
 # ccache can speed up subsequent builds
 # Set to 0 or 1
-USE_CCACHE=1
+USE_CCACHE=
 
-# GCC toolchain prefix
-# For example, if set to:
-#       "x86_64-redhat-linux-"
-# then the build system would use: 
-#       x86_64-redhat-linux-gcc
-#       x86_64-redhat-linux-as
-#       x86_64-redhat-linux-ld
-#       ...
-CROSS_COMPILE=
+# The "template" kernel config file
+# When .config file is generated, feature selections in this file will be preferred.
+DEFCONFIG=
 
-# Target triple
-# Only used by AOSP's clang
-CLANG_TRIPLE=
+# Build targets
+# Run 'make help' for available targets. Items marked with '*' will be built if this array is empty
+M_TARGETS=()
 
-# Changes the info of /proc/version
+# Commands to run after .config file is generated
+POST_DEFCONFIG_CMDS=
+
+# Commands to run after kernel build
+POST_DEFCONFIG_CMDS=
+
+# Set the metadata shown in /proc/version
 KBUILD_BUILD_TIMESTAMP=$(commit_time)
 KBUILD_BUILD_HOST=build-host
 KBUILD_BUILD_USER=build-user
 KBUILD_BUILD_VERSION=1
 
 # Inherit user configs
+# Do not change unless you know what you're doing
 for dd in "." ".."; do
     ff=${scriptPWD}/${dd}/build.override
     if [[ -f "$ff" ]]; then

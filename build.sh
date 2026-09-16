@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 set -e
-MAKE_OVERRIDES=("$@")
+M_OVERRIDE_ARGS=("$@")
 scriptPWD=$(dirname "$(realpath "${BASH_SOURCE[0]}")")
 . "${scriptPWD}/core_utils.sh"
 . "${scriptPWD}/etc_utils.sh"
@@ -14,7 +14,7 @@ if [[ ${NO_CLEANING} != "1" ]]; then
     __make mrproper
     
     eee "> Generating config"
-    __make "${M_CONFIG}"
+    __make "${DEFCONFIG}"
     
     if [ -n "${POST_DEFCONFIG_CMDS}" ]; then
         eee "> Running pre-make command(s):"
@@ -25,7 +25,7 @@ if [[ ${NO_CLEANING} != "1" ]]; then
 fi
 
 eee "> Starting build"
-__make "${M_GOALS[@]}"
+__make "${M_TARGETS[@]}"
 
 if [ -n "${POST_BUILD_CMDS}" ]; then
     eee "> Running post-build command(s):"
