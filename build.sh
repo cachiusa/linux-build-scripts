@@ -17,7 +17,7 @@ if [[ ${NO_CLEANING} != "1" ]]; then
     for cmd in "${POST_DEFCONFIG_CMDS[@]}"; do
         eee "  Running pre-make command:"
         # shellcheck disable=SC2086
-        exec2 $cmd
+        execP $cmd
     done
 fi
 
@@ -27,7 +27,7 @@ __make "${M_TARGETS[@]}"
 for cmd in "${POST_BUILD_CMDS[@]}"; do
     eee "  Running post-build command:"
     # shellcheck disable=SC2086
-    exec2 $cmd
+    execP $cmd
 done
 
 eee "  Build finished"

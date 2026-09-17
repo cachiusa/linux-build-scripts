@@ -19,26 +19,25 @@ getval() {
     eval "echo \$$1"
 }
 add_M_arg() {
-    M_ARGS+=("$@")
+    MAKE_ARGS+=("$@")
 }
 add_M_var() {
-    # shellcheck disable=SC2086
     _v=$(getval "$1")
-    [[ -n ${_v} ]] && M_ARGS+=("$1=$_v")
+    [[ -n $_v ]] && add_M_arg "$1=$_v"
 }
 print_path() {
     echo "PATH="
     IFS=':' read -ra __PATH <<< "$PATH"
-    for p in "${__PATH[@]}"; do
-        echo "     $p"
+    for _p in "${__PATH[@]}"; do
+        echo "     $_p"
     done
 }
 __make() {
     # The make wrapper
-    exec2 make "${M_ARGS[@]}" "${M_OVERRIDE_ARGS[@]}" "$@"
+    execP make "${MAKE_ARGS[@]}" "${MAKE_OVERRIDE_ARGS[@]}" "$@"
 }
 configure() {
-    exec2 ./scripts/config --file "${KBUILD_OUTPUT}/.config" "$@"
+    execP ./scripts/config --file "${KBUILD_OUTPUT}/.config" "$@"
     __make olddefconfig
 }
 commit_time() {
@@ -47,19 +46,19 @@ commit_time() {
     SOURCE_DATE_EPOCH=$(git log -1 --pretty=%ct)
     date -d @"$SOURCE_DATE_EPOCH"
 }
-export_and_print() {
+exportP() {
     for v in "$@"; do
         export "$v"
         echo "$v=$(getval "$v")"
     done
 }
-exec2() {
+execP() {
     ee "\n> $*"
     "$@"
 }
 envsetup() {
+    MAKE_ARGS=()
     MAKEFLAGS="-j$(nproc) ${MAKEFLAGS}"
-    M_ARGS=()
     add_M_var LLVM
     add_M_var LLVM_IAS
     add_M_var CC
@@ -76,9 +75,9 @@ envsetup() {
     if [[ -d ${TC_HOME} ]]; then
         export PATH=$TC_HOME:$PATH
     fi
-    export_and_print MAKEFLAGS KBUILD_OUTPUT ARCH CROSS_COMPILE CLANG_TRIPLE \
+    exportP MAKEFLAGS KBUILD_OUTPUT ARCH CROSS_COMPILE CLANG_TRIPLE \
         KBUILD_BUILD_TIMESTAMP KBUILD_BUILD_HOST KBUILD_BUILD_USER KBUILD_BUILD_VERSION
     print_path
     # set_colors
-    exec2 "${CC}" -v
+    execP "${CC}" -v
 }
