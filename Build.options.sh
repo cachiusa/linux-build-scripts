@@ -1,19 +1,21 @@
+##### Required
 # The number of jobs (commands) to run simultaneously.
-# Lower if your machine struggles with build
 JOBS=$(nproc)
 
+##### Required
 # Build output directory
-OUT_DIR=${OUT_DIR:-out}
+OUT_DIR=out
 
 # Target architecture
 # Empty value will use build host's arch
 ARCH=
 
 # C Compiler
-# Empty value will use clang/gcc
+# Empty value infers the use of clang/gcc
 CC=
 
 # Path to build toolchain
+# Empty value means system installed toolchain will be used
 TC_HOME=
 
 # GNU toolchain prefix
@@ -23,26 +25,31 @@ TC_HOME=
 #       x86_64-redhat-linux-gcc
 #       x86_64-redhat-linux-ld
 #       ...
+# Has no effect when LLVM=1 is set
 CROSS_COMPILE=
 
 # Target triple
-# Only used by AOSP version of Clang
+# Only used by Android version of Clang
 # https://lkml.org/lkml/2021/9/9/136
 CLANG_TRIPLE=
 
 # 1 = Use LLVM toolchain
-# 0 = Do not
-# Most newer kernels will adopt this
+# 0 = Do not (default)
+# Most newer kernels (especially Android) will adopt this
+# https://android.googlesource.com/platform/prebuilts/clang/host/linux-x86/+/master/BINUTILS_KERNEL_DEPRECATION.md
 LLVM=
 
-# 1 = use GNU assembler "as"
-# 0 = use Clang's integrated assembler
+# 0 = use GNU assembler
+# 1 = use Clang's integrated assembler (default since Linux 5.15)
+# https://github.com/torvalds/linux/commit/f12b034afeb3a977bbb1c6584dedc0f3dc666f14
 LLVM_IAS=
 
 # ccache can speed up subsequent builds
-# Set to 0 or 1
+# 1 = enable
+# 0 = Do not (default)
 USE_CCACHE=
 
+##### Required
 # The "template" kernel config file
 # When .config file is generated, feature selections in this file will be preferred.
 DEFCONFIG=
