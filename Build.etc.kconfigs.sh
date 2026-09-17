@@ -14,7 +14,7 @@ configure_lto() {
     # and also disables LTO-dependent features like CFI. This mode is not
     # recommended because CFI will not be able to catch bugs if it is
     # disabled.
-    eee "> Modifying LTO mode to '${LTO}'"
+    eee "  Modifying LTO mode to '${LTO}'"
     if [[ $1 = "none" ]]; then
         configure -d LTO_CLANG -e LTO_NONE -d LTO_CLANG_THIN -d LTO_CLANG_FULL -d THINLTO --set-val FRAME_WARN 0
     elif [[ $1 = "thin" ]]; then

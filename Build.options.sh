@@ -1,10 +1,8 @@
-##### Required
-# The number of jobs (commands) to run simultaneously.
-JOBS=$(nproc)
+# shellcheck disable=all
 
 ##### Required
 # Build output directory
-OUT_DIR=out
+KBUILD_OUTPUT=out
 
 # Target architecture
 # Empty value will use build host's arch
@@ -73,13 +71,13 @@ KBUILD_BUILD_VERSION=1
 # Inherit user configs
 # Do not change unless you know what you're doing
 if [[ -f ${BUILD_CONFIG} ]]; then
-    eee "> Using config file:\n  $BUILD_CONFIG"
+    eee "  Using config file: $BUILD_CONFIG"
     . "$BUILD_CONFIG"
 else
     for dd in "$scriptPWD" "$PWD"; do
         ff=${dd}/Build.options
         [[ ! -f "$ff" ]] && continue
-        eee "> Using config file:\n  $ff"
+        eee "  Using config file: $ff"
         . "$ff"
     done
 fi

@@ -1,3 +1,4 @@
+# shellcheck disable=SC2163
 set_colors() {
     if [[ -n ${GITHUB_ACTION} || -t 1 ]]; then
         _restore='\e[0m'
@@ -5,35 +6,39 @@ set_colors() {
         _white='\e[1;37m'
     fi
 }
-echohr() {
+ehr() {
     echo "========================================================"
 }
 ee() {
     echo -e "$1"
 }
 eee() {
-    ee "$(echohr)\n${_green}$1${_restore}"
+    ee "$(ehr)\n${_green}$1${_restore}"
 }
-add_arg() {
+getval() {
+    eval "echo \$$1"
+}
+add_M_arg() {
     M_ARGS+=("$@")
 }
+add_M_var() {
+    # shellcheck disable=SC2086
+    _v=$(getval "$1")
+    [[ -n ${_v} ]] && M_ARGS+=("$1=$_v")
+}
 print_path() {
-    eee "PATH="
-    IFS=':' read -ra echopaths <<< "$PATH"
-    for lst in "${echopaths[@]}"; do
-        echo "  $lst"
+    echo "PATH="
+    IFS=':' read -ra __PATH <<< "$PATH"
+    for p in "${__PATH[@]}"; do
+        echo "     $p"
     done
 }
 __make() {
     # The make wrapper
-    set -x
-    make "${M_ARGS[@]}" "${M_OVERRIDE_ARGS[@]}" "$@"
-    set +x
+    exec2 make "${M_ARGS[@]}" "${M_OVERRIDE_ARGS[@]}" "$@"
 }
 configure() {
-    set -x
-    ./scripts/config --file "${OUT_DIR}/.config" "$@"
-    set +x
+    exec2 ./scripts/config --file "${KBUILD_OUTPUT}/.config" "$@"
     __make olddefconfig
 }
 commit_time() {
@@ -44,26 +49,21 @@ commit_time() {
 }
 export_and_print() {
     for v in "$@"; do
-        # shellcheck disable=SC2163
         export "$v"
-        vv=$(eval "echo \$$v")
-        echo "$v=$vv"
+        echo "$v=$(getval "$v")"
     done
 }
+exec2() {
+    ee "\n> $*"
+    "$@"
+}
 envsetup() {
-    M_ARGS=("-j${JOBS}")
-    if [[ -n ${OUT_DIR} ]]; then
-        add_arg "O=${OUT_DIR}"
-    fi
-    if [[ -n ${LLVM} ]]; then
-        add_arg "LLVM=1"
-        if [[ -n ${LLVM_IAS} ]]; then
-            add_arg "LLVM_IAS=1"
-        fi
-    fi
-    if [[ -n ${CC} ]]; then
-        add_arg "CC=${CC}"
-    else
+    MAKEFLAGS="-j$(nproc) ${MAKEFLAGS}"
+    M_ARGS=()
+    add_M_var LLVM
+    add_M_var LLVM_IAS
+    add_M_var CC
+    if [[ -z ${CC} ]]; then
         if [[ -n ${LLVM} ]]; then
             CC=clang
         else
@@ -71,13 +71,14 @@ envsetup() {
         fi
     fi
     if [[ ${USE_CCACHE} = "1" ]]; then
-        add_arg "CC=ccache ${CC}"
+        add_M_arg "CC=ccache ${CC}"
     fi
     if [[ -d ${TC_HOME} ]]; then
         export PATH=$TC_HOME:$PATH
     fi
-    export_and_print ARCH CROSS_COMPILE CLANG_TRIPLE \
+    export_and_print MAKEFLAGS KBUILD_OUTPUT ARCH CROSS_COMPILE CLANG_TRIPLE \
         KBUILD_BUILD_TIMESTAMP KBUILD_BUILD_HOST KBUILD_BUILD_USER KBUILD_BUILD_VERSION
-    set_colors
     print_path
+    # set_colors
+    exec2 "${CC}" -v
 }
