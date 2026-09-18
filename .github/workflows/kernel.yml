@@ -1,0 +1,35 @@
+name: Build Linux
+on:
+- workflow_dispatch
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v6
+      with:
+        fetch-depth: 1
+    - name: Build deps
+      run: |
+        ./setup/debian.sh
+        sudo apt-get install -y --no-install-recommends clang clang-tools llvm lld
+        git clone https://github.com/torvalds/linux.git --depth=1 --no-tags
+    - name: ccache
+      uses: actions/cache@v6
+      with:
+        path: ${{ github.workspace }}/out/.ccache
+        key: ccache-${{ github.run_id }}
+        restore-keys: ccache-
+    # - name: ThinLTO cache
+    #   uses: actions/cache@v6
+    #   with:
+    #     path: ${{ github.workspace }}/out/.thinlto-cache
+    #     key: thinlto-${{ github.run_id }}
+    #     restore-keys: thinlto-
+    - name: Run build
+      run: |
+        echo "LLVM=1; USE_CCACHE=1; DEFCONFIG=tinyconfig; LTO=none;" > Build.options
+        cd linux
+        ccache -o cache_dir="$(pwd)/out/.ccache"
+        ccache -o compression=false
+        ../build.sh -j2
+
