@@ -16,7 +16,7 @@ jobs:
     - name: ccache
       uses: actions/cache@v6
       with:
-        path: ${{ github.workspace }}/out/.ccache
+        path: ${{ github.workspace }}/linux/out/.ccache
         key: ccache-${{ github.run_id }}
         restore-keys: ccache-
     # - name: ThinLTO cache
