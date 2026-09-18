@@ -50,8 +50,11 @@ commit_time() {
 }
 exportP() {
     for v in "$@"; do
-        export "$v"
-        echo "$v=$(getval "$v")"
+        _v=$(getval "$v")
+        if [[ -n $_v ]]; then
+            export "$v"
+        fi
+        echo "$v=$_v"
     done
 }
 execP() {
