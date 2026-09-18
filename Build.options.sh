@@ -1,5 +1,10 @@
 # shellcheck disable=all
 
+# This file contains default build options and should only be used for reference
+# If you want to override these settings, create a `Build.options` file 
+#    in the same directory as the build scripts,
+# or in the root of your kernel tree.
+
 ##### Required
 # Build output directory
 KBUILD_OUTPUT=out
@@ -75,9 +80,10 @@ if [[ -f ${BUILD_CONFIG} ]]; then
     . "$BUILD_CONFIG"
 else
     for dd in "$scriptPWD" "$PWD"; do
-        ff=${dd}/Build.options
-        [[ ! -f "$ff" ]] && continue
-        eee "  Using config file: $ff"
-        . "$ff"
+        ff=$dd/Build.options
+        if [[ -f "$ff" ]]; then
+            eee "  Using config file: $ff"
+            . "$ff"
+        fi
     done
 fi

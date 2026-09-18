@@ -23,7 +23,9 @@ add_M_arg() {
 }
 add_M_var() {
     _v=$(getval "$1")
-    [[ -n $_v ]] && add_M_arg "$1=$_v"
+    if [[ -n $_v ]]; then
+        add_M_arg "$1=$_v"
+    fi
 }
 print_path() {
     echo "PATH="

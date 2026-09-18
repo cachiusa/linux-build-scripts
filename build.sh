@@ -3,7 +3,7 @@ set -e
 scriptPWD=$(dirname "$(realpath "${BASH_SOURCE[0]}")")
 . "${scriptPWD}/Build.core.sh"
 
-if [[ ${NO_CLEANING} != "1" ]]; then
+if [[ ${DIRTY} != "1" ]]; then
     eee "  Cleaning up"
     __make mrproper
     
