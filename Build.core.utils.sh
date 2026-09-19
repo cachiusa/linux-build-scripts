@@ -2,18 +2,30 @@
 set_colors() {
     if [[ -n ${GITHUB_ACTION} || -t 1 ]]; then
         _restore='\e[0m'
-        _green='\e[1;32m'
-        _white='\e[1;37m'
+        _red='\e[1;91m'
+        _green='\e[1;92m'
+        _white='\e[1;97m'
+        _yel='\e[1;33m'
     fi
 }
 ehr() {
     echo "========================================================"
 }
-ee() {
-    echo -e "$1"
+eM() {
+    local modal=$1
+    local text=$2
+    local modalcolor
+    case ${modal} in
+        "warning" | "notice") modalcolor=$_yel;;
+        "error") modalcolor=$_red;;
+    esac
+    if [[ -n ${modal} ]]; then
+        modal="${modal}: "
+    fi
+    echo -e "${modalcolor}${modal}${_white}${text}${_restore}"
 }
-eee() {
-    ee "$(ehr)\n${_green}$1${_restore}"
+eH() {
+    eM "" "$(ehr)\n$1"
 }
 getval() {
     eval "echo \$$1"
@@ -58,10 +70,11 @@ exportP() {
     done
 }
 execP() {
-    ee "\n> $*"
+    eM "" "\n> $*"
     "$@"
 }
 envsetup() {
+    set_colors
     MAKE_ARGS=()
     MAKEFLAGS="-j$(nproc) ${MAKEFLAGS}"
     if [[ -z ${CC} ]]; then
@@ -74,6 +87,9 @@ envsetup() {
         add_M_var CC
     fi
     if [[ ${USE_CCACHE} = "1" ]]; then
+        eM "notice" "setting KBUILD_BUILD_TIMESTAMP='' to avoid ccache miss"
+        eM "notice" "please only USE_CCACHE for local development builds."
+        export KBUILD_BUILD_TIMESTAMP=
         add_M_arg "CC=ccache ${CC}"
     fi
     if [[ -d ${TC_HOME} ]]; then
@@ -82,6 +98,5 @@ envsetup() {
     exportP MAKEFLAGS KBUILD_OUTPUT ARCH CROSS_COMPILE CLANG_TRIPLE LLVM LLVM_IAS \
         KBUILD_BUILD_TIMESTAMP KBUILD_BUILD_HOST KBUILD_BUILD_USER KBUILD_BUILD_VERSION
     print_path
-    # set_colors
     execP "${CC}" -v
 }

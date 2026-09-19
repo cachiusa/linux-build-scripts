@@ -79,13 +79,13 @@ KBUILD_BUILD_VERSION=1
 # Inherit user configs
 # Do not change unless you know what you're doing
 if [[ -f ${BUILD_CONFIG} ]]; then
-    eee "  Using config file: $BUILD_CONFIG"
+    eH "  Using config file: $BUILD_CONFIG"
     . "$BUILD_CONFIG"
 else
     for dd in "$scriptPWD" "$PWD"; do
         ff=$dd/Build.options
         if [[ -f "$ff" ]]; then
-            eee "  Using config file: $ff"
+            eH "  Using config file: $ff"
             . "$ff"
         fi
     done
