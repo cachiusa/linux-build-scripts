@@ -1,12 +1,14 @@
 # shellcheck disable=all
 
 # This file contains default build options and should only be used for reference
+#
 # If you want to override these settings, create a `Build.options` file 
 #    in the same directory as the build scripts,
 # or in the root of your kernel tree.
 
-##### Required
 # Build output directory
+# On newer versions of Qualcomm/CAF's Linux fork, you must specify an out folder.
+# https://github.com/LinuxPanda/android_kernel_xiaomi_rosy/pull/4
 KBUILD_OUTPUT=out
 
 # Target architecture
@@ -36,18 +38,19 @@ CROSS_COMPILE=
 # https://lkml.org/lkml/2021/9/9/136
 CLANG_TRIPLE=
 
-# 1 = Use LLVM toolchain
-# 0 = Do not (default)
+# 1 = use LLVM toolchain
+# 0 = use GNU toolchain (default)
 # Most newer kernels (especially Android) will adopt this
 # https://android.googlesource.com/platform/prebuilts/clang/host/linux-x86/+/master/BINUTILS_KERNEL_DEPRECATION.md
 LLVM=
 
-# 0 = use GNU assembler
 # 1 = use Clang's integrated assembler (default since Linux 5.15)
+# 0 = do not
 # https://github.com/torvalds/linux/commit/f12b034afeb3a977bbb1c6584dedc0f3dc666f14
 LLVM_IAS=
 
 # ccache can speed up subsequent builds
+# https://nickdesaulniers.github.io/blog/2018/06/02/speeding-up-linux-kernel-builds-with-ccache/
 # 1 = enable
 # 0 = Do not (default)
 USE_CCACHE=
