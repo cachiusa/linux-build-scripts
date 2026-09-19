@@ -1,4 +1,4 @@
-# shellcheck disable=SC2163
+# shellcheck disable=SC2034,SC2163
 set_colors() {
     if [[ -n ${GITHUB_ACTION} || -t 1 ]]; then
         _restore='\e[0m'
@@ -64,15 +64,14 @@ execP() {
 envsetup() {
     MAKE_ARGS=()
     MAKEFLAGS="-j$(nproc) ${MAKEFLAGS}"
-    add_M_var LLVM
-    add_M_var LLVM_IAS
-    add_M_var CC
     if [[ -z ${CC} ]]; then
         if [[ -n ${LLVM} ]]; then
             CC=clang
         else
             CC=${CROSS_COMPILE}gcc
         fi
+    else
+        add_M_var CC
     fi
     if [[ ${USE_CCACHE} = "1" ]]; then
         add_M_arg "CC=ccache ${CC}"
@@ -80,7 +79,7 @@ envsetup() {
     if [[ -d ${TC_HOME} ]]; then
         export PATH=$TC_HOME:$PATH
     fi
-    exportP MAKEFLAGS KBUILD_OUTPUT ARCH CROSS_COMPILE CLANG_TRIPLE \
+    exportP MAKEFLAGS KBUILD_OUTPUT ARCH CROSS_COMPILE CLANG_TRIPLE LLVM LLVM_IAS \
         KBUILD_BUILD_TIMESTAMP KBUILD_BUILD_HOST KBUILD_BUILD_USER KBUILD_BUILD_VERSION
     print_path
     # set_colors

@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+# shellcheck disable=SC2086
 set -e
 scriptPWD=$(dirname "$(realpath "${BASH_SOURCE[0]}")")
 . "${scriptPWD}/Build.core.sh"
@@ -8,15 +9,14 @@ if [[ ${DIRTY} != "1" ]]; then
     __make mrproper
     
     eee "  Generating config"
-    __make "${DEFCONFIG}"
+    __make ${DEFCONFIG}
 
     if [[ -n ${LTO} ]]; then
-        configure_lto "${LTO}"
+        configure_lto ${LTO}
     fi
     
     for cmd in "${POST_DEFCONFIG_CMDS[@]}"; do
         eee "  Running pre-make command:"
-        # shellcheck disable=SC2086
         execP $cmd
     done
 fi
@@ -26,7 +26,6 @@ __make "${M_TARGETS[@]}"
 
 for cmd in "${POST_BUILD_CMDS[@]}"; do
     eee "  Running post-build command:"
-    # shellcheck disable=SC2086
     execP $cmd
 done
 
