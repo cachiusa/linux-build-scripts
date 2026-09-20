@@ -67,7 +67,7 @@ commit_time() {
     date -d @"$SOURCE_DATE_EPOCH"
 }
 use_config() {
-    if [[ -z "$1" ]]; then
+    if [[ ! -f "$1" ]]; then
         return 1
     fi
     eH "  Using config file:"
