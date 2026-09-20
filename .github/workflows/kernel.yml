@@ -1,7 +1,10 @@
 name: Build Linux
 on:
-- workflow_dispatch
-- push
+  workflow_dispatch:
+  push:
+    paths:
+      - "**.yml"
+      - "**.sh"
 jobs:
   build:
     runs-on: ubuntu-latest
