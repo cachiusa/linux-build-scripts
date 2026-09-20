@@ -15,26 +15,38 @@ KBUILD_OUTPUT=out
 # Empty value will use build host's arch
 ARCH=
 
+# -- Required --
+# The "template" kernel config file. When .config file is generated, feature selections in this file will be honored.
+# You can find one in:
+#     arch/< kernel arch >/configs
+# If you don't know what to choose, just fill this with "defconfig"
+DEFCONFIG=
+
+# Build targets
+# Run './build/make help' for available targets.
+# Empty array means you will build all items marked with (*)
+M_TARGETS=()
+
 # C Compiler
 # Empty value infers the use of clang/gcc
 CC=
 
 # Path to build toolchain
-# Empty value means system installed toolchain will be used
+# Empty value means system installed toolchain will be used (or whatever is in your PATH)
 TC_HOME=
 
 # GNU toolchain prefix
-# For example, if set to:
+#   For example, if set to:
 #       "x86_64-redhat-linux-"
-# then the kernel build system would use: 
+#   then the kernel build system would use: 
 #       x86_64-redhat-linux-gcc
 #       x86_64-redhat-linux-ld
 #       ...
-# Has no effect when LLVM=1 is set
+# Has no effect when LLVM=1
 CROSS_COMPILE=
 
 # Target triple
-# Only used by Android version of Clang
+# Only used by Android's fork of Clang/LLVM
 # https://lkml.org/lkml/2021/9/9/136
 CLANG_TRIPLE=
 
@@ -55,15 +67,6 @@ LLVM_IAS=
 # 0 = Do not (default)
 USE_CCACHE=
 
-##### Required
-# The "template" kernel config file
-# When .config file is generated, feature selections in this file will be preferred.
-DEFCONFIG=
-
-# Build targets
-# Run './build/make help' for available targets. Items marked with * will be built if this array is empty
-M_TARGETS=()
-
 # Commands to run after .config file is generated
 POST_DEFCONFIG_CMDS=()
 
@@ -76,10 +79,21 @@ KBUILD_BUILD_HOST=build-host
 KBUILD_BUILD_USER=build-user
 KBUILD_BUILD_VERSION=1
 
-# Inherit user configs
-# Do not change unless you know what you're doing
-if ! use_config "${BUILD_CONFIG}"; then
-    for dd in "$scriptPWD" "$PWD"; do
-        use_config "$dd/Build.options"
-    done
-fi
+# If set to "full", force any kernel with LTO_CLANG support to be built
+# with full LTO, which is the most optimized method. This is the default,
+# but can result in very slow build times, especially when building
+# incrementally. (This mode does not require CFI to be disabled.)
+#
+# If set to "thin", force any kernel with LTO_CLANG support to be built
+# with ThinLTO, which trades off some optimizations for incremental build
+# speed. This is nearly always what you want for local development. (This
+# mode does not require CFI to be disabled.)
+#
+# If set to "none", force any kernel with LTO_CLANG support to be built
+# without any LTO (upstream default), which results in no optimizations
+# and also disables LTO-dependent features like CFI. This mode is not
+# recommended because CFI will not be able to catch bugs if it is
+# disabled.
+# 
+# Empty value means your DEFCONFIG will decide.
+LTO=

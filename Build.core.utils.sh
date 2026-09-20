@@ -1,4 +1,3 @@
-# shellcheck disable=SC2034,SC2163
 set_colors() {
     if [[ -n ${GITHUB_ACTION} || -t 1 ]]; then
         _restore='\e[0m'
@@ -8,28 +7,24 @@ set_colors() {
         _yel='\e[1;33m'
     fi
 }
-ehr() {
-    echo "========================================================"
-}
 eM() {
     local text=$1
     local modal=$2
     local modalcolor
     local abrt
     case ${modal} in
-        "warning" | "notice") modalcolor=$_yel;;
-        "error") modalcolor=$_red; abrt=1;;
+        "warning" | "notice")
+            modalcolor=$_yel ;;
+        "error")
+            modalcolor=$_red
+            abrt=1 ;;
     esac
-    if [[ -n ${modal} ]]; then
-        modal="${modal}: "
-    fi
+    if [[ -n ${modal} ]]; then modal="${modal}: "; fi
     echo -e "${modalcolor}${modal}${_white}${text}${_restore}"
-    if [[ -n ${abrt} ]]; then
-        exit 1
-    fi
+    if [[ -n ${abrt} ]]; then exit 1; fi
 }
 eH() {
-    eM "$(ehr)\n$1"
+    eM "${hr}\n  $1"
 }
 getval() {
     eval "echo \$$1"
@@ -40,17 +35,13 @@ add_M_arg() {
 add_M_var() {
     for v in "$@"; do
         _v=$(getval "$v")
-        if [[ -n $_v ]]; then
-            add_M_arg "$1=$_v"
-        fi
+        [[ -n $_v ]] && add_M_arg "$1=$_v"
     done
 }
 print_path() {
+    local indent="     "
     echo "PATH="
-    IFS=':' read -ra __PATH <<< "$PATH"
-    for _p in "${__PATH[@]}"; do
-        echo "     $_p"
-    done
+    echo "${indent}${PATH}" | sed "s/:/\n${indent}/g"
 }
 __make() {
     # The make wrapper
@@ -67,31 +58,38 @@ commit_time() {
     date -d @"$SOURCE_DATE_EPOCH"
 }
 use_config() {
-    if [[ ! -f "$1" ]]; then
-        return 1
-    fi
-    eH "  Using config file:"
+    [[ -f "$1" ]] || return 1
+    eH "Using config file:"
     set -a
     # shellcheck disable=SC1090
     . "$1"
     set +a
 }
-safe_unset() {
+check_export() {
     for v in "$@"; do
         _v=$(getval "$v")
-        if [[ -z $_v ]]; then
-            unset "$v"
-        else
+        if [[ -n $_v ]]; then
             echo "$v=$_v"
+            # shellcheck disable=SC2163
+            export "$v"
+        else
+            unset "$v"
         fi
     done
 }
 execP() {
     eM "\n> $*"
-    "$@"
+    set -e; "$@"; set +e
 }
 envsetup() {
+    hr="========================================================"
     set_colors
+    if ! use_config "${BUILD_CONFIG}"; then
+        # shellcheck disable=SC2154
+        for dd in "$scriptPWD" "$PWD"; do
+            use_config "$dd/Build.options"
+        done
+    fi
     MAKE_ARGS=()
     MAKEFLAGS="-j$(nproc) ${MAKEFLAGS}"
     if [[ -z ${CC} ]]; then
@@ -99,13 +97,14 @@ envsetup() {
             CC=clang
         else
             CC=${CROSS_COMPILE}gcc
+            eM "CC and LLVM not defined, using '$CC' compiler" "notice"
         fi
     else
         add_M_var CC
     fi
     add_M_var LD AR NM OBJCOPY OBJDUMP READELF OBJSIZE STRIP
-    safe_unset KBUILD_OUTPUT ARCH LLVM LLVM_IAS \
-        CLANG_TRIPLE CROSS_COMPILE CROSS_COMPILE_ARM32 CROSS_COMPILE_COMPAT \
+    check_export KBUILD_OUTPUT ARCH LLVM LLVM_IAS CROSS_COMPILE \
+        CLANG_TRIPLE CROSS_COMPILE_ARM32 CROSS_COMPILE_COMPAT \
         KBUILD_BUILD_TIMESTAMP KBUILD_BUILD_HOST KBUILD_BUILD_USER KBUILD_BUILD_VERSION
     export MAKEFLAGS
     if [[ -d ${TC_HOME} ]]; then
