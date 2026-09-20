@@ -67,7 +67,9 @@ commit_time() {
     date -d @"$SOURCE_DATE_EPOCH"
 }
 use_config() {
-    [[ -f "$1" ]] || return 1
+    if [[ -z "$1" ]]; then
+        return 1
+    fi
     eH "  Using config file:"
     set -a
     # shellcheck disable=SC1090
