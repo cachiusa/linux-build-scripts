@@ -12,20 +12,24 @@ ehr() {
     echo "========================================================"
 }
 eM() {
-    local modal=$1
-    local text=$2
+    local text=$1
+    local modal=$2
     local modalcolor
+    local abrt
     case ${modal} in
         "warning" | "notice") modalcolor=$_yel;;
-        "error") modalcolor=$_red;;
+        "error") modalcolor=$_red; abrt=1;;
     esac
     if [[ -n ${modal} ]]; then
         modal="${modal}: "
     fi
     echo -e "${modalcolor}${modal}${_white}${text}${_restore}"
+    if [[ -n ${abrt} ]]; then
+        exit 1
+    fi
 }
 eH() {
-    eM "" "$(ehr)\n$1"
+    eM "$(ehr)\n$1"
 }
 getval() {
     eval "echo \$$1"
@@ -34,10 +38,12 @@ add_M_arg() {
     MAKE_ARGS+=("$@")
 }
 add_M_var() {
-    _v=$(getval "$1")
-    if [[ -n $_v ]]; then
-        add_M_arg "$1=$_v"
-    fi
+    for v in "$@"; do
+        _v=$(getval "$v")
+        if [[ -n $_v ]]; then
+            add_M_arg "$1=$_v"
+        fi
+    done
 }
 print_path() {
     echo "PATH="
@@ -60,17 +66,26 @@ commit_time() {
     SOURCE_DATE_EPOCH=$(git log -1 --pretty=%ct)
     date -d @"$SOURCE_DATE_EPOCH"
 }
-exportP() {
+use_config() {
+    [[ -f "$1" ]] || return 1
+    eH "  Using config file:"
+    set -a
+    # shellcheck disable=SC1090
+    . "$1"
+    set +a
+}
+safe_unset() {
     for v in "$@"; do
         _v=$(getval "$v")
-        if [[ -n $_v ]]; then
-            export "$v"
+        if [[ -z $_v ]]; then
+            unset "$v"
+        else
+            echo "$v=$_v"
         fi
-        echo "$v=$_v"
     done
 }
 execP() {
-    eM "" "\n> $*"
+    eM "\n> $*"
     "$@"
 }
 envsetup() {
@@ -86,17 +101,20 @@ envsetup() {
     else
         add_M_var CC
     fi
-    if [[ ${USE_CCACHE} = "1" ]]; then
-        eM "notice" "setting KBUILD_BUILD_TIMESTAMP='' to avoid ccache miss"
-        eM "notice" "please only USE_CCACHE for local development builds."
-        export KBUILD_BUILD_TIMESTAMP=
-        add_M_arg "CC=ccache ${CC}"
-    fi
+    add_M_var LD AR NM OBJCOPY OBJDUMP READELF OBJSIZE STRIP
+    safe_unset KBUILD_OUTPUT ARCH LLVM LLVM_IAS \
+        CLANG_TRIPLE CROSS_COMPILE CROSS_COMPILE_ARM32 CROSS_COMPILE_COMPAT \
+        KBUILD_BUILD_TIMESTAMP KBUILD_BUILD_HOST KBUILD_BUILD_USER KBUILD_BUILD_VERSION
+    export MAKEFLAGS
     if [[ -d ${TC_HOME} ]]; then
         export PATH=$TC_HOME:$PATH
     fi
-    exportP MAKEFLAGS KBUILD_OUTPUT ARCH CROSS_COMPILE CLANG_TRIPLE LLVM LLVM_IAS \
-        KBUILD_BUILD_TIMESTAMP KBUILD_BUILD_HOST KBUILD_BUILD_USER KBUILD_BUILD_VERSION
+    if [[ ${USE_CCACHE} = "1" ]]; then
+        eM "setting KBUILD_BUILD_TIMESTAMP='' to avoid ccache miss" "notice"
+        eM "please only USE_CCACHE for local development builds." "notice"
+        export KBUILD_BUILD_TIMESTAMP=
+        add_M_arg "CC=ccache ${CC}"
+    fi
     print_path
     execP "${CC}" -v
 }
