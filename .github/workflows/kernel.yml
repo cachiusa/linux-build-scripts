@@ -6,21 +6,21 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout
+    - uses: actions/checkout@main
       with:
         fetch-depth: 1
     - name: Build deps
       run: |
-        # ./setup/debian.sh
+        ./setup/debian.sh
         git clone https://github.com/torvalds/linux.git --depth=1 --no-tags
     - name: ccache
-      uses: actions/cache
+      uses: actions/cache@main
       with:
         path: ${{ github.workspace }}/linux/out/.ccache
         key: ccache-${{ github.run_id }}
         restore-keys: ccache-
     # - name: ThinLTO cache
-    #   uses: actions/cache@v6
+    #   uses: actions/cache@main
     #   with:
     #     path: ${{ github.workspace }}/out/.thinlto-cache
     #     key: thinlto-${{ github.run_id }}
