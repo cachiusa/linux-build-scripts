@@ -79,21 +79,8 @@ KBUILD_BUILD_HOST=build-host
 KBUILD_BUILD_USER=build-user
 KBUILD_BUILD_VERSION=1
 
-# If set to "full", force any kernel with LTO_CLANG support to be built
-# with full LTO, which is the most optimized method. This is the default,
-# but can result in very slow build times, especially when building
-# incrementally. (This mode does not require CFI to be disabled.)
-#
-# If set to "thin", force any kernel with LTO_CLANG support to be built
-# with ThinLTO, which trades off some optimizations for incremental build
-# speed. This is nearly always what you want for local development. (This
-# mode does not require CFI to be disabled.)
-#
-# If set to "none", force any kernel with LTO_CLANG support to be built
-# without any LTO (upstream default), which results in no optimizations
-# and also disables LTO-dependent features like CFI. This mode is not
-# recommended because CFI will not be able to catch bugs if it is
-# disabled.
-# 
+# Control Clang/LLVM's Link Time Optimization
+# Set to "none", "thin", or "full"
+# https://wiki.gentoo.org/wiki/LTO#Terminology
 # Empty value means your DEFCONFIG will decide.
 LTO=

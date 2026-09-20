@@ -12,7 +12,8 @@ jobs:
     - name: Build deps
       run: |
         ./setup/debian.sh
-        git clone https://github.com/torvalds/linux.git --depth=1 --no-tags
+        curl $(curl https://cdn.kernel.org/index.html | grep -A2 'id="latest_link"' | grep -oP 'href="\K[^"]+') | tar -xJ
+        mv linux* linux
     - name: ccache
       uses: actions/cache@main
       with:
