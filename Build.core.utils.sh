@@ -103,10 +103,12 @@ envsetup() {
         add_M_var CC
     fi
     add_M_var LD AR NM OBJCOPY OBJDUMP READELF OBJSIZE STRIP
-    check_export KBUILD_OUTPUT ARCH LLVM LLVM_IAS CROSS_COMPILE \
-        CLANG_TRIPLE CROSS_COMPILE_ARM32 CROSS_COMPILE_COMPAT \
+    check_export MAKEFLAGS KBUILD_OUTPUT ARCH LLVM LLVM_IAS \
+        CLANG_TRIPLE CROSS_COMPILE CROSS_COMPILE_ARM32 CROSS_COMPILE_COMPAT \
         KBUILD_BUILD_TIMESTAMP KBUILD_BUILD_HOST KBUILD_BUILD_USER KBUILD_BUILD_VERSION
-    export MAKEFLAGS
+    if [[ -z ${ARCH} ]]; then
+        eM "ARCH not defined. Your host is '$(uname -m)', inferring from that." "notice"
+    fi
     if [[ -d ${TC_HOME} ]]; then
         export PATH=$TC_HOME:$PATH
     fi

@@ -14,21 +14,14 @@ jobs:
         fetch-depth: 1
     - name: Build deps
       run: |
-        ./setup/debian.sh
-        curl $(curl https://cdn.kernel.org/index.html | grep -A2 'id="latest_link"' | grep -oP 'href="\K[^"]+') | tar -xJ
-        mv linux* linux
+        ./setup/packages.debian.sh
+        ./setup/source.kernel.org.sh
     - name: ccache
       uses: actions/cache@main
       with:
         path: ${{ github.workspace }}/linux/out/.ccache
         key: ccache-${{ github.run_id }}
         restore-keys: ccache-
-    # - name: ThinLTO cache
-    #   uses: actions/cache@main
-    #   with:
-    #     path: ${{ github.workspace }}/out/.thinlto-cache
-    #     key: thinlto-${{ github.run_id }}
-    #     restore-keys: thinlto-
     - name: Run build
       run: |
         echo "USE_CCACHE=1; DEFCONFIG=tinyconfig;" > Build.options

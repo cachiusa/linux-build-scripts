@@ -1,21 +1,23 @@
 # shellcheck disable=all
+
 TC_HOME=$PWD/../llvm/bin
 USE_CCACHE=1
+LTO=thin
 
 ARCH=arm64
 
 LLVM=1
 LLVM_IAS=1
-LTO=thin
 
 DEFCONFIG=veux_defconfig
+
 M_TARGETS=(
     Image
     dtbs
 )
 POST_DEFCONFIG_CMDS=(
     "configure -e KSU"
-    "configure_droidspaces gki"
+    "configure_droidspaces"
 )
 configure_inject_ramdisk() {
     configure \

@@ -32,7 +32,7 @@ kernel tree
 ...
 ```
 
-You can find available settings in [Build.options.sh](./Build.options.sh)
+You can find available settings in [config/Default.sh](./config/Default.sh)
 
 ## build.sh
 
